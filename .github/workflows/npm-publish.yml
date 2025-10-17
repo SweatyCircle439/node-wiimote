@@ -6,17 +6,21 @@ name: Node.js Package
 on:
   release:
     types: [created]
+    
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 22
           registry-url: https://registry.npmjs.org/
+      - name: Update npm # Ensure npm 11.5.1 or later is installed for OIDC
+        run: npm install -g npm@latest
       - run: npm ci
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTOMATION_TOKEN}}
